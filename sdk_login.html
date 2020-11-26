@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+
+	<!-- jQuery cdn  -->
+	<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+	<!-- firebase sdk cdn -->
+	<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+
+	<script>
+		// 회원가입, 로그인 처리
+		function signin(info){
+		    console.log("회원가입, 로그인 처리");
+
+            // 회원가입, 로그인 처리 로직 입력
+		}
+
+        // 이메일/비밀번호 로그인
+		function normal_login(){
+		    var email = $("[name=email]").val();
+            var password = $("[name=password]").val();
+
+            firebase.auth().signInWithEmailAndPassword(email, password).then(function(result) {
+                console.log(result);
+
+                // firebase.auth().currentUser.sendEmailVerification(); // 이메인 인증시 사용
+            }).catch(function(error) {
+                alert('login fail');
+                var errorCode = error.code;
+                var errorMessage = error.message;
+
+                console.log(errorCode);
+                console.log(errorMessage);
+            });
+		}
+
+        //구글 로그인
+		function google_login(){
+            var provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+
+            /*
+			* 새창으로 띄울 경우 :  firebase.auth().signInWithPopup
+			* 페이지로 이동시킬경우 : firebase.auth().signInWithRedirect
+			* */
+            firebase.auth().signInWithPopup(provider).then(function(result) {
+                var token = result.credential.accessToken;
+                var user = result.user;
+
+                if(user){
+                    signin(user);
+                }else{
+                    alert("login fail");
+                }
+            }).catch(function(error) {
+                alert("login fail");
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                var email = error.email;
+                var credential = error.credential;
+
+                console.log(errorCode);
+                console.log(errorMessage);
+            });
+		}
+
+        //페이스북 로그인
+		function facebook_login(){
+            var provider = new firebase.auth.FacebookAuthProvider();
+            //provider.addScope('user_birthday'); //받아올 정보
+
+            /*
+			* 새창으로 띄울 경우 :  firebase.auth().signInWithPopup
+			* 페이지로 이동시킬경우 : firebase.auth().signInWithRedirect
+			* */
+            firebase.auth().signInWithPopup(provider).then(function(result) {
+                var token = result.credential.accessToken;
+                var user = result.user;
+
+                if(user){
+                    signin(user);
+                }else{
+                    alert("login fail");
+                }
+            }).catch(function(error) {
+                alert("login fail");
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                var email = error.email;
+                var credential = error.credential;
+
+                console.log(errorCode);
+                console.log(errorMessage);
+            });
+		}
+
+        //애플 로그인
+		function apple_login(){
+            var provider = new firebase.auth.OAuthProvider('apple.com');
+            //받아올 정보들 (두개다 정보를 못불러 올수도 있습니다.)
+            provider.addScope('email');
+            provider.addScope('name');
+
+            /*
+			* 새창으로 띄울 경우 :  firebase.auth().signInWithPopup
+			* 페이지로 이동시킬경우 : firebase.auth().signInWithRedirect
+			* */
+            firebase.auth().signInWithPopup(provider).then(function(result) {
+                // The signed-in user info.
+                var user = result.user;
+                // You can also get the Apple OAuth Access and ID Tokens.
+                var accessToken = result.credential.accessToken;
+                var idToken = result.credential.idToken;
+
+                console.log(user);
+            })
+            .catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // The email of the user's account used.
+                var email = error.email;
+                // The firebase.auth.AuthCredential type that was used.
+                var credential = error.credential;
+            });
+		}
+	</script>
+</head>
+<body>
+	<div>
+        <h1>firebase login</h1>
+        <input type="text" name="email" value=""/>
+        <input type="text" name="password" value=""/>
+        <button onClick="normal_login();">normal login</button>
+    </div>
+	<br>
+	<br>
+	<br>
+    <div>
+        <button onClick="google_login();">google login</button>
+        <button onClick="facebook_login();">facebook login</button>
+        <button onClick="apple_login();">apple login</button>
+    </div>
+
+
+	<script>
+        // firebase 키값 (firebase console -> authentication -> sign-in method)
+        var firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            measurementId: ""
+        };
+        // Initialize Firebase
+        // firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+
+        // firebase 로그인 결과 (firebase.auth().signInWithRedirect 으로 로그인 할경우 사용)
+        firebase.auth().getRedirectResult().then(function(result) {
+            if (result.credential) {
+                var token = result.credential.accessToken;
+            }
+            var user = result.user;
+
+            console.log("-----result-----");
+            console.log(user);
+            if(user){
+                signin(user);
+            }
+        }).catch(function(error) {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            var email = error.email;
+            var credential = error.credential;
+
+            console.log("-----error-----");
+            console.log(errorCode);
+            console.log(errorMessage);
+        });
+	</script>
+</body>
+</html>
