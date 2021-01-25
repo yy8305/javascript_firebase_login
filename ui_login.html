@@ -21,8 +21,49 @@
 	</script>
 </head>
 <body>
-    <!-- 추후 내용 추가 예정입니다. -->
-    <!-- 추후 내용 추가 예정입니다. -->
-    <!-- 추후 내용 추가 예정입니다. -->
+    <div id="firebaseui-auth-container"></div>
+	<div id="loader">Loading...</div>
+	
+	<script>
+		// firebase 키 설정
+		var firebaseConfig = {
+			apiKey: "",
+			authDomain: "",
+			databaseURL: "",
+			projectId: "",
+			storageBucket: "",
+			messagingSenderId: "",
+			appId: "",
+			measurementId: ""
+		};
+		// Initialize Firebase
+		// firebase 초기화
+		firebase.initializeApp(firebaseConfig);
+	
+		// Initialize the FirebaseUI Widget using Firebase.
+		var ui = new firebaseui.auth.AuthUI(firebase.auth());
+	
+		ui.start('#firebaseui-auth-container', {
+			signInOptions: [
+				// List of OAuth providers supported.
+				firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+				firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+				"apple.com", //애플 로그인 필요시
+				firebase.auth.EmailAuthProvider.PROVIDER_ID
+			],
+			callbacks: {
+				signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+					firebase.auth().currentUser.sendEmailVerification(); // 이메일 체크 함수
+	
+					console.log("success");
+					return true;
+				},
+				uiShown: function() {
+					document.getElementById('loader').style.display = 'none';
+				}
+			},
+			signInSuccessUrl: '/',
+		});
+	</script>
 </body>
 </html>
